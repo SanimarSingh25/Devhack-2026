@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 
 const Tab = createBottomTabNavigator();
 
-function HomeScreen() {
+/*unction HomeScreen() {
   const [isDetecting, setIsDetecting] = useState(false);
   const [accel, setAccel] = useState({ x: 0, y: 0, z: 0 });
 
@@ -22,7 +22,7 @@ function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pothole Detection</Text>
+      <Text style={styles.title}>Welcome</Text>
       <Button
         title={isDetecting ? 'Stop Detection' : 'Start Detection'}
         color={isDetecting ? 'red' : 'green'}
@@ -36,7 +36,7 @@ function HomeScreen() {
       </Text>
     </View>
   );
-}
+}*/
 
 function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -73,22 +73,22 @@ function ReportsScreen() {
   );
 }
 
-function SettingsScreen() {
+/*function SettingsScreen() {
   return (
     <View style={styles.container}>
       <Text>Settings Screen</Text>
     </View>
   );
-}
+}*/
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName="Home">
-        <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Navigator initialRouteName="Map">
+       
         <Tab.Screen name="Map" component={MapScreen} />
         <Tab.Screen name="Reports" component={ReportsScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreen} />
+        
       </Tab.Navigator>
     </NavigationContainer>
   );
@@ -98,3 +98,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding:20 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
 });
+
+
+/* 
+88  <Tab.Screen name="Home" component={HomeScreen} /> 
+91 <Tab.Screen name="Settings" component={SettingsScreen} />
+*/
