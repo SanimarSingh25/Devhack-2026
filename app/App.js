@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Accelerometer } from 'expo-sensors';
 import * as Location from 'expo-location';
+import MapView, { Marker } from 'react-native-maps';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -40,27 +42,55 @@ const Tab = createBottomTabNavigator();
 
 function MapScreen() {
   const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log('Permission denied');
+        setErrorMsg('Location permission denied');
         return;
       }
-      let loc = await Location.getCurrentPositionAsync({});
+
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
       setLocation(loc.coords);
     })();
   }, []);
 
+  if (errorMsg) {
+    return (
+      <View style={styles.container}>
+        <Text>{errorMsg}</Text>
+      </View>
+    );
+  }
+
+  if (!location) {
+    return (
+      <View style={styles.container}>
+        <Text>Getting location…</Text>
+      </View>
+    );
+  }
+
+  const region = {
+    latitude: location.latitude,
+    longitude: location.longitude,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Map Screen (placeholder)</Text>
-      {location && (
-        <Text>
-          Latitude: {location.latitude.toFixed(4)}, Longitude: {location.longitude.toFixed(4)}
-        </Text>
-      )}
+    <View style={{ flex: 1 }}>
+      <MapView style={{ flex: 1 }} initialRegion={region}>
+        <Marker
+          coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+          title="You are here"
+        />
+      </MapView>
     </View>
   );
 }
