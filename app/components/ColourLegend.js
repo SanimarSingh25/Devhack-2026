@@ -3,10 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 
 export default function ColourLegend() {
     const legendData = [
-        { label: 'Extremely Bumpy', value: '1.0', color: '#FF0000' },
-        { label: 'Very Bumpy', value: '0.6', color: '#FFA500' },
-        { label: 'Moderately Bumpy', value: '0.4', color: '#FFFF00' },
-        { label: 'Slightly Bumpy', value: '0.2', color: '#00FF00' },
+        { label: 'High', value: '0.75 - 1.0', color: '#FF0000' },
+        { label: 'Medium', value: '0.45 - 0.74', color: '#FFA500' },
+        { label: 'Low', value: '0.0 - 0.44', color: '#FFFF00' },
     ];
 
     return (
@@ -30,13 +29,16 @@ export default function ColourLegend() {
 const colourStyles = StyleSheet.create({
     legendContainer: {
         position: 'absolute',
-        bottom: 30,
-        right: 20,
+        top: 50,
+        left: 20,
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
         padding: 12,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: 'rgba(0, 0, 0, 0.2)',
+        zIndex: 1000,
+        elevation: 5,
+        minWidth: 150,
     },
     title: {
         color: '#131111',
