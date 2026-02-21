@@ -5,6 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BumpCircles from '../components/BumpCircles';
 import BumpHeatmap from '../components/BumpHeatmap';
+import ColourLegend from '../components/ColourLegend';
 import { fetchBumps } from '../utils/supabase';
 
 export default function HeatmapScreen() {
@@ -69,6 +70,8 @@ export default function HeatmapScreen() {
         {useHeatmap ? <BumpHeatmap bumps={bumps} /> : <BumpCircles bumps={bumps} />}
       </MapView>
 
+      <ColourLegend />
+
       <TouchableOpacity
         style={styles.toggleButton}
         onPress={() => setUseHeatmap(!useHeatmap)}
@@ -91,6 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
+    zIndex: 1001,
   },
   toggleText: {
     color: 'white',

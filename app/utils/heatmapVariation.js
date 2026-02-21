@@ -29,17 +29,15 @@ export async function fetchBumps(boundingBox) {
 }
 
 const heatMapColors = {
-    0.2 : 'green',
     0.4 : 'yellow',
     0.6 : 'orange',
     1.0 : 'red'
 }
 
 export function getHeatMapColor(intensity) {
-    if(intensity <= 0.2) return heatMapColors[0.2];
-    else if(intensity <= 0.4) return heatMapColors[0.4];
-    else if(intensity <= 0.6) return heatMapColors[0.6];
-    else return heatMapColors[1.0];
+    if(intensity >= 0.75) return heatMapColors[1.0];
+    else if(intensity >= 0.45) return heatMapColors[0.6];
+    else return heatMapColors[0.4];
 }
 
 export async function getHeatMapPoints(boundingBox) {
