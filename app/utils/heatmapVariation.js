@@ -1,0 +1,53 @@
+import { createClient } from '@supabase/supabase-js';
+const SUPABASE_URL = 'your_supabase_url_here';
+const SUPABASE_ANON_KEY = 'your_supabase_anon_key_here';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+export async function uploadBump(bumpData) {
+    const { data, error } = await supabase
+        .from('bumps')
+        .insert([bumpData])
+
+    if (error) console.error('Error uploading bump:', error);
+    return data;
+}
+
+export async function fetchBumps(boundingBox) {
+    const { data, error } = await supabase
+        .from('bumps')
+        .select('*')
+        .gte('lat', boundingBox.minLat)
+        .lte('lat', boundingBox.maxLat)
+        .gte('lng', boundingBox.minLng)
+        .lte('lng', boundingBox.maxLng);
+
+    if (error) {
+        console.error('Error fetching bumps:', error);
+        return [];
+    }
+    return data;
+}
+
+const heatMapColors = {
+    0.2 : 'green',
+    0.4 : 'yellow',
+    0.6 : 'orange',
+    1.0 : 'red'
+}
+
+export function getHeatMapColor(intensity) {
+    if(intensity <= 0.2) return heatMapColors[0.2];
+    else if(intensity <= 0.4) return heatMapColors[0.4];
+    else if(intensity <= 0.6) return heatMapColors[0.6];
+    else return heatMapColors[1.0];
+}
+
+export async function getHeatMapPoints(boundingBox) {
+    const bumps = await fetchBumps(boundingBox);
+
+    return bumps.map(bump => ({
+        lat: bump.lat,
+        lng: bump.lng,
+        intensity: bump.severity
+    }));
+}
