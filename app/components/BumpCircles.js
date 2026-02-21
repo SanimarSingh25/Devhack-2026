@@ -18,7 +18,7 @@ export default function BumpCircles({ bumps }) {
     <Circle
       key={bump.id}
       center={{ latitude: bump.lat, longitude: bump.lng }}
-      radius={30 + bump.severity * 8}
+      radius={6 + bump.severity * 1}
       fillColor={getSeverityColor(bump.severity)}
       strokeColor={getSeverityBorderColor(bump.severity)}
       strokeWidth={1}
