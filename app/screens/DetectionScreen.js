@@ -5,6 +5,8 @@ import * as Location from 'expo-location';
 import { startDetection, stopDetection } from '../utils/bumpDetection';
 import BumpCircles from '../components/BumpCircles';
 import DetectionControls from '../components/DetectionControls';
+import * as Haptics from 'expo-haptics';
+
 
 export default function DetectionScreen() {
   const [isDetecting, setIsDetecting] = useState(true);
@@ -51,6 +53,14 @@ export default function DetectionScreen() {
       startDetection(
         () => locationRef.current,
         (bump) => {
+          // 📳 Vibrate based on severity
+          if (bump.severity === "HIGH") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          } else if (bump.severity === "MEDIUM") {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          } else {
+           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
           bump.id = bumpIdRef.current++;
           setBumps((prev) => [...prev, bump]);
           // TODO: uploadBump(bump) to Supabase
