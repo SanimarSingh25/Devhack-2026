@@ -1,9 +1,49 @@
 import React from 'react';
-import { Heatmap } from 'react-native-maps';
+import { Platform } from 'react-native';
+import { Circle } from 'react-native-maps';
 
-export default function BumpHeatmap({ bumps }) {
-  if (bumps.length === 0) return null;
+let NativeHeatmap = null;
+if (Platform.OS === 'android') {
+  NativeHeatmap = require('react-native-maps').Heatmap;
+}
 
+// ── Fake heatmap for iOS ────────────────────────────────────
+// Concentric circles per bump. Where bumps overlap, transparency
+// stacks and the area looks "hotter" — approximates a gradient.
+
+const LAYERS = [
+  { radiusScale: 3.5, opacity: 0.04 },
+  { radiusScale: 2.5, opacity: 0.07 },
+  { radiusScale: 1.6, opacity: 0.12 },
+  { radiusScale: 0.9, opacity: 0.18 },
+];
+
+function getColor(severity, opacity) {
+  if (severity >= 4) return `rgba(255, 30, 0, ${opacity})`;
+  if (severity >= 2.5) return `rgba(255, 140, 0, ${opacity})`;
+  return `rgba(255, 220, 0, ${opacity})`;
+}
+
+function FakeHeatmap({ bumps }) {
+  const baseRadius = 25;
+
+  return bumps.flatMap((bump) =>
+    LAYERS.map((layer, i) => (
+      <Circle
+        key={`${bump.id}-${i}`}
+        center={{ latitude: bump.lat, longitude: bump.lng }}
+        radius={(baseRadius + bump.severity * 8) * layer.radiusScale}
+        fillColor={getColor(bump.severity, layer.opacity)}
+        strokeColor="transparent"
+        strokeWidth={0}
+      />
+    ))
+  );
+}
+
+// ── Real heatmap for Android ────────────────────────────────
+
+function RealHeatmap({ bumps }) {
   const points = bumps.map((bump) => ({
     latitude: bump.lat,
     longitude: bump.lng,
@@ -11,10 +51,22 @@ export default function BumpHeatmap({ bumps }) {
   }));
 
   return (
-    <Heatmap
+    <NativeHeatmap
       points={points}
       radius={40}
       opacity={0.7}
     />
   );
+}
+
+// ── Public component ────────────────────────────────────────
+
+export default function BumpHeatmap({ bumps }) {
+  if (bumps.length === 0) return null;
+
+  if (NativeHeatmap) {
+    return <RealHeatmap bumps={bumps} />;
+  }
+
+  return <FakeHeatmap bumps={bumps} />;
 }
