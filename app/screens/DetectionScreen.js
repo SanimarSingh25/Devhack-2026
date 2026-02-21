@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native';
 import MapView from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -6,7 +7,7 @@ import { startDetection, stopDetection } from '../utils/bumpDetection';
 import BumpCircles from '../components/BumpCircles';
 import DetectionControls from '../components/DetectionControls';
 import * as Haptics from 'expo-haptics';
-import { uploadBump } from '../utils/supabase';
+import { uploadBump, fetchBumps } from '../utils/supabase';
 
 
 export default function DetectionScreen() {
@@ -47,6 +48,17 @@ export default function DetectionScreen() {
       if (locationSub) locationSub.remove();
     };
   }, []);
+
+  // Fetch existing bumps when tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const data = await fetchBumps();
+        setBumps(data);
+        bumpIdRef.current = data.length;
+      })();
+    }, [])
+  );
 
   // Start/stop bump detection
   useEffect(() => {

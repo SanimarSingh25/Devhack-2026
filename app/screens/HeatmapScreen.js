@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -12,6 +13,7 @@ export default function HeatmapScreen() {
   const [bumps, setBumps] = useState([]);
   const [useHeatmap, setUseHeatmap] = useState(false);
 
+  // Get location once on mount
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -25,11 +27,18 @@ export default function HeatmapScreen() {
       });
 
       setLocation(loc.coords);
-
-      const data = await fetchBumps();
-      setBumps(data);
     })();
   }, []);
+
+  // Re-fetch bumps every time this tab comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const data = await fetchBumps();
+        setBumps(data);
+      })();
+    }, [])
+  );
 
   if (errorMsg) {
     return (
