@@ -1,8 +1,47 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
+import { View, Text, Button,TouchableOpacity, StyleSheet } from 'react-native';
+import { Accelerometer } from "expo-sensors";
 export default function DetectionControls({ isDetecting, onToggle, bumpCount }) {
   // TODO: start/stop button, live stats (bump count, speed, status)
+
+const subscriptionRef = React.useRef(null);
+const lastReadingRef = React.useRef(null);
+
+React.useEffect(() => {
+  if (isDetecting) {
+    subscriptionRef.current = Accelerometer.addListener((data) => {
+      const { x, y, z } = data;
+
+      if (lastReadingRef.current) {
+        const delta =
+          Math.abs(x - lastReadingRef.current.x) +
+          Math.abs(y - lastReadingRef.current.y) +
+          Math.abs(z - lastReadingRef.current.z);
+
+        const threshold = 1.8;
+
+        if (delta > threshold) {
+          console.log("BUMP DETECTED");
+        }
+      }
+
+      lastReadingRef.current = data;
+    });
+
+    Accelerometer.setUpdateInterval(200);
+  } else {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.remove();
+      subscriptionRef.current = null;
+    }
+  }
+
+  return () => {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.remove();
+    }
+  };
+}, [isDetecting]);
   return (
     <View style={styles.overlay}>
       <TouchableOpacity
@@ -16,6 +55,10 @@ export default function DetectionControls({ isDetecting, onToggle, bumpCount }) 
       {isDetecting && (
         <Text style={styles.stats}>Bumps detected: {bumpCount}</Text>
       )}
+     <Button
+      title={isDetecting ? "Stop Detection" : "Start Detection"}
+      onPress={onToggle}
+    />
     </View>
   );
 }
