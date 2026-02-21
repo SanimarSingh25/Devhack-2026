@@ -1,17 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { fetchBumps } from '../utils/supabase';
 
-const DUMMY_REPORTS = [
-  { id: 'r1', timestamp: Date.now() - 1000 * 60 * 5, severityScore: 0.82, lat: 43.2609, lon: -79.9192 },
-  { id: 'r2', timestamp: Date.now() - 1000 * 60 * 50, severityScore: 0.35, lat: 43.2551, lon: -79.9201 },
-  { id: 'r3', timestamp: Date.now() - 1000 * 60 * 120, severityScore: 0.62, lat: 43.2587, lon: -79.9150 },
-  { id: 'r4', timestamp: Date.now() - 1000 * 60 * 10, severityScore: 0.91, lat: 43.2614, lon: -79.9230 },
-  { id: 'r5', timestamp: Date.now() - 1000 * 60 * 200, severityScore: 0.18, lat: 43.2620, lon: -79.9100 },
-];
-
+// Severity is 1–10 from bumpDetection
 function severityLabel(score) {
-  if (score >= 0.75) return 'High';
-  if (score >= 0.45) return 'Medium';
+  if (score >= 6) return 'High';
+  if (score >= 3) return 'Medium';
   return 'Low';
 }
 
@@ -25,13 +20,25 @@ function roundCoord(x) {
 }
 
 export default function ReportsScreen() {
+  const [bumps, setBumps] = useState([]);
   const [filter, setFilter] = useState('All'); // All | Low | Medium | High
   const [sort, setSort] = useState('Newest');  // Newest | SeverityHigh | SeverityLow
 
+  // Re-fetch from Supabase every time this tab is focused
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const data = await fetchBumps();
+        setBumps(data);
+      })();
+    }, [])
+  );
+
   const data = useMemo(() => {
-    let out = DUMMY_REPORTS.map((r) => ({
+    let out = bumps.map((r) => ({
       ...r,
-      severity: severityLabel(r.severityScore),
+      severityScore: r.severity,
+      severity: severityLabel(r.severity),
     }));
 
     if (filter !== 'All') {
@@ -47,7 +54,7 @@ export default function ReportsScreen() {
     }
 
     return out;
-  }, [filter, sort]);
+  }, [bumps, filter, sort]);
 
   return (
     <View style={styles.container}>
@@ -91,7 +98,7 @@ export default function ReportsScreen() {
 
             <Text style={styles.metaText}>Time: {formatTime(item.timestamp)}</Text>
             <Text style={styles.metaText}>
-              Location: {roundCoord(item.lat)}, {roundCoord(item.lon)}
+              Location: {roundCoord(item.lat)}, {roundCoord(item.lng)}
             </Text>
           </View>
         )}
