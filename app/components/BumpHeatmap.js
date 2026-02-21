@@ -12,10 +12,10 @@ if (Platform.OS === 'android') {
 // stacks and the area looks "hotter" — approximates a gradient.
 
 const LAYERS = [
-  { radiusScale: 3.5, opacity: 0.04 },
-  { radiusScale: 2.5, opacity: 0.07 },
-  { radiusScale: 1.6, opacity: 0.12 },
-  { radiusScale: 0.9, opacity: 0.18 },
+  { radiusScale: 3.0, opacity: 0.05 },
+  { radiusScale: 2.0, opacity: 0.10 },
+  { radiusScale: 1.2, opacity: 0.20 },
+  { radiusScale: 0.5, opacity: 0.35 },
 ];
 
 function getColor(severity, opacity) {
@@ -25,14 +25,14 @@ function getColor(severity, opacity) {
 }
 
 function FakeHeatmap({ bumps }) {
-  const baseRadius = 25;
+  const baseRadius = 2;
 
   return bumps.flatMap((bump) =>
     LAYERS.map((layer, i) => (
       <Circle
         key={`${bump.id}-${i}`}
         center={{ latitude: bump.lat, longitude: bump.lng }}
-        radius={(baseRadius + bump.severity * 8) * layer.radiusScale}
+        radius={(baseRadius + bump.severity * 0.3) * layer.radiusScale}
         fillColor={getColor(bump.severity, layer.opacity)}
         strokeColor="transparent"
         strokeWidth={0}
@@ -53,7 +53,7 @@ function RealHeatmap({ bumps }) {
   return (
     <NativeHeatmap
       points={points}
-      radius={40}
+      radius={15}
       opacity={0.7}
     />
   );
