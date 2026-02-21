@@ -4,6 +4,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BumpCircles from '../components/BumpCircles';
 import BumpHeatmap from '../components/BumpHeatmap';
+import { fetchBumps } from '../utils/supabase';
 
 export default function HeatmapScreen() {
   const [location, setLocation] = useState(null);
@@ -25,18 +26,8 @@ export default function HeatmapScreen() {
 
       setLocation(loc.coords);
 
-      // Generate fake bump data near current location for testing
-      // TODO: replace with fetchBumps() from Supabase
-      const fakeBumps = [];
-      for (let i = 0; i < 20; i++) {
-        fakeBumps.push({
-          id: i,
-          lat: loc.coords.latitude + (Math.random() - 0.5) * 0.01,
-          lng: loc.coords.longitude + (Math.random() - 0.5) * 0.01,
-          severity: Math.random() * 6 + 1,
-        });
-      }
-      setBumps(fakeBumps);
+      const data = await fetchBumps();
+      setBumps(data);
     })();
   }, []);
 

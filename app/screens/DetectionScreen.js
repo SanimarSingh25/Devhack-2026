@@ -6,6 +6,7 @@ import { startDetection, stopDetection } from '../utils/bumpDetection';
 import BumpCircles from '../components/BumpCircles';
 import DetectionControls from '../components/DetectionControls';
 import * as Haptics from 'expo-haptics';
+import { uploadBump } from '../utils/supabase';
 
 
 export default function DetectionScreen() {
@@ -63,7 +64,7 @@ export default function DetectionScreen() {
           }
           bump.id = bumpIdRef.current++;
           setBumps((prev) => [...prev, bump]);
-          // TODO: uploadBump(bump) to Supabase
+          uploadBump(bump);
         }
       );
     } else {
