@@ -4,8 +4,8 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function ColourLegend() {
     const legendData = [
         { label: 'High', value: '0.75 - 1.0', color: '#FF0000' },
-        { label: 'Medium', value: '0.45 - 0.74', color: '#FFA500' },
-        { label: 'Low', value: '0.0 - 0.44', color: '#FFFF00' },
+        { label: 'Medium', value: '0.45 - 0.74', color: '#FF5F1F' },
+        { label: 'Low', value: '0.0 - 0.44', color: '#FFD700' },
     ];
 
     return (
