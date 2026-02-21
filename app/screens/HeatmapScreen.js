@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import BumpCircles from '../components/BumpCircles';
+import BumpHeatmap from '../components/BumpHeatmap';
 
 export default function HeatmapScreen() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [bumps, setBumps] = useState([]);
+  const [useHeatmap, setUseHeatmap] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -64,12 +66,35 @@ export default function HeatmapScreen() {
   return (
     <View style={{ flex: 1 }}>
       <MapView style={{ flex: 1 }} initialRegion={region} showsUserLocation={true}>
-        <BumpCircles bumps={bumps} />
+        {useHeatmap ? <BumpHeatmap bumps={bumps} /> : <BumpCircles bumps={bumps} />}
       </MapView>
+
+      <TouchableOpacity
+        style={styles.toggleButton}
+        onPress={() => setUseHeatmap(!useHeatmap)}
+      >
+        <Text style={styles.toggleText}>
+          {useHeatmap ? 'Circles' : 'Heatmap'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  toggleButton: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  toggleText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+  },
 });
